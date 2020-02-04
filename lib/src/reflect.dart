@@ -27,11 +27,7 @@ class Reflect with ChangeNotifier {
   void rollback() {
     print(_stateHistory);
     print(_state);
-    if (_stateHistory.length > 0) {
-      _state = _stateHistory.removeLast();
-    } else {
-      reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
-    }
+    _state = _stateHistory.removeLast();
 
     notifyListeners();
   }
