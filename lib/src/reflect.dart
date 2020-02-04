@@ -25,8 +25,6 @@ class Reflect with ChangeNotifier {
   void addReducer(ReflectReducer reducer) => reducers.add(reducer);
 
   void rollback() {
-    print(_stateHistory);
-    print(_state);
     if (_stateHistory.length > 0) {
       _state = _stateHistory.removeLast();
     } else {
@@ -36,5 +34,6 @@ class Reflect with ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, dynamic> get state => _state;
+  Map<String, dynamic> get state => Map.from(_state);
+  ListQueue<Map<String, dynamic>> get stateHistory => _stateHistory;
 }
