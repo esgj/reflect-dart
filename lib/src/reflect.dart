@@ -12,6 +12,7 @@ class Reflect with ChangeNotifier {
 
   Reflect.createState({this.reducers}) {
     _state = Map();
+    _stateHistory = ListQueue();
     reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
   }
 
