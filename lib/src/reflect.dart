@@ -17,7 +17,7 @@ class Reflect with ChangeNotifier {
   }
 
   void dispatchAction({ReflectAction action}) {
-    _stateHistory.add(_state);
+    _stateHistory.add(Map.from(_state));
     reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder(_state[reducer.name], action));
     notifyListeners();
   }
@@ -27,7 +27,11 @@ class Reflect with ChangeNotifier {
   void rollback() {
     print(_stateHistory);
     print(_state);
-    _state = _stateHistory.removeLast();
+    if (_stateHistory.length > 0) {
+      _state = _stateHistory.removeLast();
+    } else {
+      reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
+    }
 
     notifyListeners();
   }
