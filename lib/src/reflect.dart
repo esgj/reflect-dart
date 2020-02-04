@@ -25,6 +25,8 @@ class Reflect with ChangeNotifier {
   void addReducer(ReflectReducer reducer) => reducers.add(reducer);
 
   bool rollback() {
+    print(_stateHistory);
+    print(_state);
     if (_stateHistory.length > 0) {
       _state = _stateHistory.removeLast();
       notifyListeners();
