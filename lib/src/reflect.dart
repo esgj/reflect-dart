@@ -24,17 +24,16 @@ class Reflect with ChangeNotifier {
 
   void addReducer(ReflectReducer reducer) => reducers.add(reducer);
 
-  bool rollback() {
+  void rollback() {
     print(_stateHistory);
     print(_state);
     if (_stateHistory.length > 0) {
       _state = _stateHistory.removeLast();
-      notifyListeners();
-      return true;
+    } else {
+      reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
     }
 
-    reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
-    return false;
+    notifyListeners();
   }
 
   Map<String, dynamic> get state => _state;
