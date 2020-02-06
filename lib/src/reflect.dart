@@ -18,7 +18,13 @@ class Reflect with ChangeNotifier {
   }
 
   void dispatchAction({ReflectAction action}) {
-    _stateHistory.add(json.encode(_state));
+    _stateHistory.add(json.encode(_state, toEncodable: (dynamic value) {
+      if (value is DateTime) {
+        return value.toIso8601String();
+      } else {
+        return value;
+      }
+    }));
     reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder(_state[reducer.name], action));
     notifyListeners();
   }
