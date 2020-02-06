@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ import 'reflect_reducer.dart';
 
 class Reflect with ChangeNotifier {
   List<dynamic> reducers;
-  ListQueue<Map<String, dynamic>> _stateHistory;
+  ListQueue<String> _stateHistory;
   Map<String, dynamic> _state;
 
   Reflect.createState({this.reducers}) {
@@ -17,7 +18,7 @@ class Reflect with ChangeNotifier {
   }
 
   void dispatchAction({ReflectAction action}) {
-    _stateHistory.add(Map.from(_state));
+    _stateHistory.add(json.encode(_state));
     reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder(_state[reducer.name], action));
     notifyListeners();
   }
@@ -26,14 +27,11 @@ class Reflect with ChangeNotifier {
 
   void rollback() {
     if (_stateHistory.length > 0) {
-      _state = _stateHistory.removeLast();
-    } else {
-      reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
+      _state = json.decode(_stateHistory.removeLast()) as Map<String, dynamic>;
+      notifyListeners();
     }
-
-    notifyListeners();
   }
 
   Map<String, dynamic> get state => Map.from(_state);
-  ListQueue<Map<String, dynamic>> get stateHistory => _stateHistory;
+  ListQueue<String> get stateHistory => _stateHistory;
 }
