@@ -1,8 +1,8 @@
 name: reflect
 description: A new Flutter package project.
-version: 0.1.4
+version: 0.1.5
 author: Espen Gjendem
-homepage: https://www.omega365.com
+homepage: https://omega365.com
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
