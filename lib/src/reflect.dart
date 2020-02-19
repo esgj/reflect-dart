@@ -1,43 +1,29 @@
-import 'dart:collection';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import 'reflect_action.dart';
 import 'reflect_reducer.dart';
 
-class Reflect with ChangeNotifier {
-  List<dynamic> reducers;
-  ListQueue<String> _stateHistory;
+class Reflect<T> with ChangeNotifier {
+  List<ReflectReducer<dynamic, T>> reducers;
   Map<String, dynamic> _state;
 
-  Reflect.createState({this.reducers}) {
+  /// Creates a [Reflect<T>] ([T] is the enum action type) object which state is determined by calling every [ReflectReducer<dynamic, T>] builder.
+  /// Must be given a list of [ReflectReducer<dynamic, T>]
+  Reflect.createState({this.reducers}) : assert(reducers != null) {
     _state = Map();
-    _stateHistory = ListQueue();
-    reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder());
+    reducers.forEach((reducer) => _state[reducer.name] = reducer.builder());
   }
 
-  void dispatchAction({ReflectAction action}) {
-    _stateHistory.add(json.encode(_state, toEncodable: (dynamic value) {
-      if (value is DateTime) {
-        return value.toIso8601String();
-      } else {
-        return value;
-      }
-    }));
+  /// Dispatch a [ReflectAction<T>] and rebuild state by calling every [ReflectReducer<dynamic, T>] builder with the current state.
+  void dispatchAction({ReflectAction<T> action}) {
     reducers.forEach((dynamic reducer) => _state[reducer.name] = reducer.builder(_state[reducer.name], action));
     notifyListeners();
   }
 
-  void addReducer(ReflectReducer reducer) => reducers.add(reducer);
+  /// Add reducer [ReflectReducer<dynamic, T>] after initial build.
+  void addReducer(ReflectReducer<dynamic, T> reducer) => reducers.add(reducer);
 
-  void rollback() {
-    if (_stateHistory.length > 0) {
-      _state = json.decode(_stateHistory.removeLast()) as Map<String, dynamic>;
-      notifyListeners();
-    }
-  }
-
+  /// Get current state, DO NOT change the state as it should work as a immutable object.
+  /// If one mutates the state directly the app might crash and result in unexpected behaviour.
   Map<String, dynamic> get state => Map.from(_state);
-  ListQueue<String> get stateHistory => _stateHistory;
 }
